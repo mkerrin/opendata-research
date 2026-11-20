@@ -1,6 +1,6 @@
 ---
 name: opendata-research
-description: Find, download and track Irish open data with the data-gov-ie and cso-ireland MCP servers. Use when searching for datasets on a topic, finding the data behind a news story, downloading or refreshing a dataset, checking how up to date a dataset really is, listing the fields a dataset has, comparing a new download with an earlier one, recording research findings, or charting it as a report or dashboard. Stores data as dated snapshots under data/<topic>/, saves every dataset's fields for reuse, logs research in data/<topic>/notes.org, and builds reports as local self-contained HTML; asks before publishing anything to claude.ai.
+description: Find, download and track Irish open data with the data-gov-ie and cso-ireland MCP servers. Use when searching for datasets on a topic, finding the data behind a news story, downloading or refreshing a dataset, checking how up to date a dataset really is, listing the fields a dataset has, checking a dataset's licence or reuse terms, comparing a new download with an earlier one, recording research findings, or charting it as a report or dashboard. Stores data as dated snapshots under data/<topic>/, saves every dataset's fields and licence for reuse, logs research in data/<topic>/notes.org, and builds reports as local self-contained HTML; asks before publishing anything to claude.ai.
 ---
 
 # Open data research
@@ -15,6 +15,10 @@ notes go in `data/<topic>/notes.org`.
 
 **Every download gets its fields saved** (§2.1), so any later dashboard can
 see what a dataset offers without re-reading the raw file.
+
+**Every dataset gets its licence checked and recorded** (§2.2), from the
+publisher's own terms, never guessed. A report is only as shareable as its
+most restrictive source.
 
 **Reports are local first.** Build a report, chart or dashboard as a
 self-contained HTML file under `data/<topic>/` (§4). **Never publish to
@@ -68,6 +72,45 @@ or the downloaded file. Report the real latest period. Examples found so far:
 - `voted-public-expenditure`: record updated Jul 2026, but the data ends in 2022.
 - CSO quarterly tables (GFQ01/GFQ04) reach the latest quarter. Annual tables lag by a year or more.
 
+### When the same data has copies under different licences, let the user choose
+
+The same figures are often published more than once: as an open table, in a
+report or workbook on the publisher's website under stricter terms, or by
+another body (e.g. Eurostat) with its own terms and timing. Don't pick one
+for the user, even the open one. Check each copy's licence (§2.2) and
+coverage, then lay out the facts and ask with `AskUserQuestion`.
+
+Give the user, for each copy:
+
+- **Licence and what it allows**: e.g. CC BY 4.0, shareable and publishable
+  with credit; or personal use only, no reproduction without permission.
+  Say what that means for any report built on it.
+- **Coverage**: first and latest period actually in the data (§1), and the
+  date the publisher last updated it.
+- **Detail**: which series, breakdowns and units it has that the others
+  don't, and anything it lacks (e.g. no per-dwelling figures, sub-sectors only
+  from 2009).
+- **How the figures compare**: check the overlap and give the size of the
+  difference (e.g. totals within 0.1%; biodiesel 3.78 vs 3.52 TWh) and why
+  (rounding, different definitions, normalisation).
+- **What switching would change** in existing reports: charts that would end
+  earlier, be dropped or be replaced, and which pages would become shareable
+  or stay personal use.
+
+Present it as a short table, then ask, with one option per copy (and a
+mixed option where views can come from different copies). Recommend one only
+if the user has said what matters most (sharing, latest year, exact match to
+a publication); otherwise give no recommendation. Record the choice and the
+reason in `notes.org`, and on the report (§4 footnote).
+
+Example (2026-11-20): SEAI's national energy balance is open as SEI01 on
+CSO PxStat and data.gov.ie (CC BY 4.0, to 2025, totals within 0.1% of the
+workbook) while the "Energy in Ireland" workbook on seai.ie is personal use
+only but also has emissions, renewable shares, carbon intensity and capacity
+to 2025. Eurostat has open versions of those to 2024 only. Given the
+choice, the user moved two dashboards to SEI01 and kept the workbook for the
+views only it has up to 2025, with a footnote explaining the licence.
+
 ## 2. Store the data as dated snapshots
 
 ```
@@ -81,8 +124,9 @@ data/<topic>/                     # kebab-case topic, e.g. irish-budget, house-p
   dashboard-<name>/               # local HTML reports and dashboards (§4), standalone.html offline
 ```
 
-- `<source>` is `cso` or `dgi` (data.gov.ie). `<id>` is the CSO matrix code
-  or the CKAN dataset `name`.
+- `<source>` is `cso`, `dgi` (data.gov.ie), `eurostat` or the publisher's
+  short name (e.g. `seai`) for a file from its own website. `<id>` is the CSO
+  matrix code, the CKAN dataset `name` or the Eurostat dataset code.
 - **Raw snapshots are never edited or overwritten.** A later download is a
   new file named with that date. Only a second download on the same day
   replaces that day's file. Trimmed or reshaped data goes in a derived file
@@ -103,6 +147,9 @@ data/<topic>/                     # kebab-case topic, e.g. irish-budget, house-p
     "download_url": "https://ws.cso.ie/.../GFQ04/CSV/1.0/en",
     "landing_page": "https://data.cso.ie/table/GFQ04",
     "units": "Euro Million",
+    "licence": {"name": "CC BY 4.0", "url": "https://creativecommons.org/licenses/by/4.0/",
+                "policy": "https://www.cso.ie/en/aboutus/whoweare/copyrightpolicy/",
+                "attribution": "Source: Central Statistics Office, Ireland", "checked": "2026-11-20"},
     "snapshots": [
       {"file": "2026-10-18.csv", "fetched_at": "2026-10-18T13:30:00Z",
        "upstream_updated": "2026-07-20", "latest_period": "2026Q1",
@@ -155,6 +202,61 @@ tables join exactly. Note shared ids under `* Fields` so later dashboards can
 combine tables. It works on any CSV, including data.gov.ie files; for those
 it profiles every column as a dimension or a measure.
 
+### 2.2 Check and record the licence (every new dataset)
+
+On the first download of a dataset, find the terms its publisher states for
+reuse and write them into `source.json` as `licence` (shape in §2). Quote the
+publisher's own page; if no page or field states a licence, record that
+("none stated") rather than assuming one.
+
+Where to look, in order:
+
+1. **The record or file itself.** data.gov.ie: `license_id` / `license_title`
+   from `package_show`. CSO PxStat JSON-stat: `extension.copyright` names the
+   copyright holder but not the licence. A workbook may carry terms on a cover
+   sheet; scan its text (e.g. `xl/sharedStrings.xml` for "licen", "copyright",
+   "reuse", "©") from a script outside the snapshot folder.
+2. **The publisher's copyright / reuse page**, usually linked in the site footer
+   ("Copyright", "Legal", "Terms", "Re-use").
+3. **The data.gov.ie record** for the same table, when the publisher's site
+   says nothing: many agencies publish their open tables there with a licence.
+
+Known terms (checked 2026-11-20; re-check before relying on them for publishing):
+
+| Publisher | Terms | Where stated | What reuse needs |
+|---|---|---|---|
+| CSO (PxStat tables) | CC BY 4.0, copyright Government of Ireland | https://www.cso.ie/en/aboutus/whoweare/copyrightpolicy/ | Credit the CSO; logo not for commercial use |
+| Other bodies' tables hosted on PxStat (e.g. SEAI's SEI01) | The body's own; `extension.copyright` names it | data.gov.ie record (SEI01: CC BY 4.0) | Credit the body |
+| data.gov.ie | Per record, `license_title`; most are CC BY 4.0 (all 53 SEAI records are) | `package_show` | As the licence says |
+| Eurostat | Free re-use, commercial or not (Commission Decision 2011/833/EU) | https://ec.europa.eu/eurostat/help/copyright-notice (the old `/about-us/policies/copyright` is a 404) | Acknowledge the source, indicate changes, and say Eurostat is not responsible for modified data. Non-commercial only: data from non-Eurostat sources and for non-EU/EFTA/candidate countries |
+| SEAI website (seai.ie files, e.g. the Energy in Ireland workbook) | No open licence: "information and/or personal use only", no modification, no reproduction on another site without written permission | https://www.seai.ie/about/corporate-governance/legal-and-privacy/ (Copyright section) | Personal use only. SEAI's CC BY tables on data.gov.ie / PxStat may have the same series: offer them as an option (§1) |
+| CRU (cru.ie decision papers, e.g. the PSO levy) | None stated: the site terms only disclaim liability, the PDFs carry no notice, and CRU has no data.gov.ie records | https://www.cru.ie/en-ie/terms-and-conditions/ | Treat as not openly licensed: quote figures with credit, ask CRU before republishing tables. A report that charts them is personal use only; Eurostat `TAX_RNW` (in nrg_pc_204_c / nrg_pc_205_c) is an open stand-in for the PSO levy |
+
+Gotchas:
+
+- Some sites refuse automated fetches (seai.ie returns 403). Read the terms in
+  the Playwright browser instead; collapsed sections can be read with
+  `browser_evaluate`. Don't give up and guess.
+- Eurostat's exceptions bite on the raw files, not just on unusual tables: the energy price tables include
+  UK and XK (Kosovo is a potential, not official, candidate), which are non-commercial only. Note which
+  countries a report uses; an EU-27-only page is unaffected.
+- Data published only as PDFs (e.g. CRU decision papers): transcribe the figures with a `make_*.py` script
+  that names the snapshot each row came from, and record the PDF's licence like any other dataset.
+- A record's licence covers that record only. The same publisher's website
+  files can be under different, stricter terms.
+- Note what a licence requires of a report (credit, "indicate changes",
+  disclaimers) so §4 can carry it into the Sources card.
+
+Record it:
+
+- `source.json` → `licence`: `name`, `url` (licence text, if any), `policy`
+  (the page that states it), `attribution` (the credit line to use),
+  `checked` (date), plus `restrictions` or `open_alternative` when they apply.
+- `notes.org` → a `- Licence:` line on the dataset under `* Datasets` (§3),
+  and a gotcha when terms are restrictive or surprising.
+- Re-check when a report built on the dataset is about to be published, or
+  if `checked` is more than a year old. A refresh alone does not need it.
+
 ### Refreshing and comparing snapshots
 
 When a dataset is downloaded again:
@@ -183,6 +285,7 @@ own `**` heading with a TODO/DONE state.
 - Source: CSO PxStat, https://data.cso.ie/table/GFQ04
 - Coverage: 2000Q1–2026Q1, quarterly, € million
 - Snapshots: [[file:cso-GFQ04/2026-10-18.csv][2026-10-18]]
+- Licence: CC BY 4.0, credit the CSO (CSO copyright policy, checked 2026-10-18)
 - Notes: items sum to total (±€2m rounding)
 
 * Fields
@@ -267,9 +370,21 @@ data/<topic>/dashboard-<name>/
    (`dash.params().x ?? 'default'`). Offline the params start empty, because
    `dash/params` exists only online. Load the `dataviz` skill before
    choosing chart forms and colours.
+   **Licence**: the Sources card ends with a `Licence` entry built from each
+   dataset's `source.json` `licence`: each source's terms with a link to the
+   page that states them, and the changes made (grouped, converted, scaled)
+   where the licence asks for them. The page is only as open as its most
+   restrictive source: if any source is not openly licensed, say "personal
+   use only" in that entry and add a footnote listing which views use which
+   source and any open alternative (with its date range). When a page
+   switches source, keep a dated footnote saying what was replaced and why.
 3. **`dashboard.json`**: as in the `save-dashboard` skill, with
    `"artifact_url": null` while it is local only. `title`, `attribution` and
-   each dataset's `local_file` and `derived_from` are required.
+   each dataset's `local_file` and `derived_from` are required. Also write
+   `licence` (one paragraph: each source's terms, and whether the page is
+   shareable), end `attribution` with a short licence line so the
+   standalone footer shows it, and add `source_change` (date, replaced,
+   why) when a page changes source.
 4. **Build and check**:
    `python3 -I .claude/skills/save-dashboard/build_standalone.py data/<topic>/dashboard-<name>`,
    then look at it once as the `save-dashboard` skill describes (serve the
@@ -287,6 +402,11 @@ share or keep.
 Publishing sends the data and page to claude.ai, where anyone it is shared
 with can open and download them. It is the user's call, every time.
 
+- **Before asking**, read every dataset's `licence` in `source.json` (check it
+  first if missing or over a year old, §2.2). If any source is not openly
+  licensed (e.g. SEAI website files: personal use only), say so in the
+  question, name the source and its open alternative if there is one, and
+  keep "Keep it local" as the recommended option.
 - **After** the local report is built and checked, ask with `AskUserQuestion`,
   for example:
   *"The report is saved at `data/<topic>/dashboard-<name>/standalone.html`.
@@ -308,12 +428,15 @@ with can open and download them. It is the user's call, every time.
 
 ## Quick checklist
 
-1. Search CSO and data.gov.ie, then confirm the real latest period.
+1. Search CSO and data.gov.ie, then confirm the real latest period. If copies differ in licence,
+   coverage or detail, set out the facts and let the user choose (§1).
 2. Download the raw file to `data/<topic>/<source>-<id>/<today>.csv` and update `source.json`.
    Then run `describe_fields.py` on it and paste its section under `* Fields` in `notes.org` (§2.1).
-3. If an earlier snapshot exists, compare against it.
-4. Analyse with a script that reads the latest snapshot.
-5. Charts and reports: choose fields from `source.json` `fields`/`measures`, then build
-   `data/<topic>/dashboard-<name>/standalone.html` locally (§4).
-6. Ask before publishing anything to claude.ai. Publish only on an explicit yes (§4 guard).
-7. Log prompts, datasets, findings, gotchas and outputs in `data/<topic>/notes.org`. Don't touch `opendata.org`.
+3. New dataset: check its licence and record it in `source.json` and `notes.org` (§2.2).
+4. If an earlier snapshot exists, compare against it.
+5. Analyse with a script that reads the latest snapshot.
+6. Charts and reports: choose fields from `source.json` `fields`/`measures`, then build
+   `data/<topic>/dashboard-<name>/standalone.html` locally (§4), with a Licence entry in its Sources card.
+7. Ask before publishing anything to claude.ai, naming any source that isn't openly licensed.
+   Publish only on an explicit yes (§4 guard).
+8. Log prompts, datasets, findings, gotchas and outputs in `data/<topic>/notes.org`. Don't touch `opendata.org`.
