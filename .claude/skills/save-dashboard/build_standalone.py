@@ -79,7 +79,7 @@ html, body { margin: 0; background: var(--color-bg); color: var(--color-fg);
 #dash-root { max-width: 1100px; margin-inline: auto; padding-block: 24px 32px;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-.sa-foot { margin-top: 20px; font-size: 0.75rem; color: var(--color-fg-muted); }
+.sa-foot { margin-top: 20px; font-size: 0.75rem; color: var(--color-fg-muted); overflow-wrap: anywhere; }
 .sa-foot a { color: inherit; }
 """
 
