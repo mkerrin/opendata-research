@@ -12,18 +12,18 @@ import type {
 const PANE = 'research-datasets'
 const PANE_TITLE = 'Datasets'
 
-const topic = atom({ plugin: 'research-mod', key: 'topic' } as const, null)
+const topic = atom({ plugin: 'opendata-mod', key: 'topic' } as const, null)
 // Change a tag when that value's fields change: it declines what an earlier
 // version stored, which outlives a reload.
 const datasets = atom(
-  { plugin: 'research-mod', key: 'datasets' } as const,
+  { plugin: 'opendata-mod', key: 'datasets' } as const,
   { topic: null, list: [] },
   { shape: 'datasets-1' },
 )
-const used = atom({ plugin: 'research-mod', key: 'used' } as const, {}, {
+const used = atom({ plugin: 'opendata-mod', key: 'used' } as const, {}, {
   shape: 'used-1',
 })
-const toggled = atom({ plugin: 'research-mod', key: 'toggled' } as const, [], {
+const toggled = atom({ plugin: 'opendata-mod', key: 'toggled' } as const, [], {
   shape: 'toggled-1',
 })
 

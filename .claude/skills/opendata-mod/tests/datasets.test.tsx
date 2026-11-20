@@ -23,7 +23,7 @@ const SOURCE = JSON.stringify({
 })
 
 const PANE = {
-  plugin: 'research-mod',
+  plugin: 'opendata-mod',
   component: 'Pane',
   requestId: 'research-datasets',
   surface: 'terminal',

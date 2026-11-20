@@ -92,7 +92,7 @@ data/<topic>/                     # kebab-case topic, e.g. irish-budget, house-p
   stored outside that folder.
 - `source.json`: create it on the first download and update it on each later one.
   The `fields`, `measures` and `fields_from` keys are written by
-  `describe_fields.py` (§2.1); don't write them by hand. The `research-mod` skill's
+  `describe_fields.py` (§2.1); don't write them by hand. The `opendata-mod` skill's
   side pane reads these keys, so keep it in step if the layout changes:
   ```json
   {
