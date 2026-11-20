@@ -90,6 +90,38 @@ The skills can also be run by name:
 | `/save-dashboard` | Build a chart or dashboard as a self-contained HTML file that opens offline |
 | `/opendata-mod` | Switch research topic. `/datasets` opens a side pane listing the topic's datasets |
 
+### Coming back to your research
+
+Your research stays in `data/<topic>/` between sessions. To pick it up again, start Claude
+Code in the `opendatamcp` folder and ask it to load the topic by name:
+
+- "Load energy data"
+- "Switch to the housing-supply research"
+
+Claude loads the topic and summarises its datasets: where each one came from, how many
+snapshots it has, and the latest period. The status line shows `Researching: <topic>`.
+`notes.org` in the topic folder has the questions, findings and gotchas from earlier sessions.
+
+### The Datasets pane
+
+`/datasets` opens the **Datasets** side pane. It also opens by itself when you load or switch
+topic. It lists each dataset in the topic with its title, source, latest period, when the
+source last updated it, your latest snapshot, and its fields and measures. Datasets used in
+this session are marked ● and listed first. Press `c` to collapse all and `e` to expand all.
+The pane updates as soon as a new snapshot is saved.
+
+### Refreshing the data
+
+Ask Claude to check for new releases, for example:
+
+- "Refresh the energy datasets"
+- "Is there newer data for cso-MSM01?"
+
+Claude downloads each dataset again as a new dated file. If nothing changed upstream it says
+so and keeps no duplicate. Otherwise it reports new periods, revised values and removed rows,
+re-runs the topic's scripts, notes whether the findings changed, and logs the refresh in
+`notes.org`. To update a dashboard with the new data, ask Claude to rebuild it.
+
 ### Where results go
 
 Each research topic gets its own folder under `data/`:
