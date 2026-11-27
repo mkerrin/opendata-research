@@ -370,6 +370,10 @@ data/<topic>/dashboard-<name>/
    (`dash.params().x ?? 'default'`). Offline the params start empty, because
    `dash/params` exists only online. Load the `dataviz` skill before
    choosing chart forms and colours.
+   **Sources**: the page ends with a Sources card: a table with one row per
+   source (ID, dataset, coverage and provenance), each row anchored as
+   `#src-<ID>`, and a "Sources: <ID>, ..." line of links under every chart
+   section's description (`save-dashboard` skill, step 3).
    **Licence**: the Sources card ends with a `Licence` entry built from each
    dataset's `source.json` `licence`: each source's terms with a link to the
    page that states them, and the changes made (grouped, converted, scaled)

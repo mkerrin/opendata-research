@@ -48,21 +48,43 @@ Examples: `data/rental-housing/dashboard-county-rents/`,
    (`dash.params().x ?? 'default'`). Offline the params start empty, because
    `dash/params` exists only online. Load the `dataviz` skill before
    choosing chart forms and colours.
-3. **Sources section at the top**: every report opens with a "Sources" card,
-   straight after the title and lede and before any filters, tiles or charts.
-   Take its facts from each dataset's `source.json`, not from memory. Write
-   it as static markup (a `<dl>`), not `data-source` marks, so it shows even
-   when data fails to load. For each source give:
-   - **Data**: the publisher and the table or file, linked to its landing
-     page (e.g. RTB via CSO table RIQ02, https://data.cso.ie/table/RIQ02).
-   - **Coverage**: the measure and units, the time span, and the geography
-     and breakdowns the page uses.
-   - **Retrieved**: the snapshot date, and the date the publisher last
-     updated it (`upstream_updated`).
-   - **Notes**: the caveats a reader needs, such as what the figures do and
-     don't measure, suppressed values being dropped, a missing national
-     total, or a licence restriction (e.g. RTB files with no open licence).
-   Example: `data/rental-housing/dashboard-county-rents/index.html`.
+3. **Sources section at the bottom**: every report ends with a "Sources"
+   card (`<section id="sources">`), after the last chart, and every chart
+   section points to it. Take its facts from each dataset's `source.json`,
+   not from memory. Write it all as static markup, not `data-source` marks,
+   so it shows even when data fails to load.
+   - **Sources table**: one row per source, with three columns: **ID**,
+     **Dataset** and **Coverage and provenance**. The ID is the publisher's
+     own table code (`CPM24`, `WPM37`, `nrg_pc_204`). When a source has no
+     code, use a short kebab-case label (`ember-wholesale`, `CRU-PSO`). Give
+     each row the anchor `id="src-<ID>"`, and make its ID cell a link to that
+     anchor (`<a href="#src-<ID>">`), so a row can be linked to directly.
+     Style `tr:target` so the linked row is highlighted. In the other two
+     columns give:
+     - **Dataset**: the publisher, and the table or file name linked to its
+       landing page (e.g. Central Statistics Office, *Consumer Price Index
+       detailed sub-indices* → https://data.cso.ie/table/CPM24).
+     - **Coverage and provenance**: the measure and units, the time span, the
+       geography and breakdowns the page uses, any derivation done here
+       (e.g. "worked out as I_TAX minus X_TAX", linking the ID it was taken
+       from), and **retrieved**: the snapshot date, and the date the
+       publisher last updated it (`upstream_updated`).
+   - **Notes and Licence** follow the table as a `<dl>`: **Notes** holds the
+     caveats a reader needs (what the figures do and don't measure,
+     suppressed values dropped, a missing national total, rebasing).
+     **Licence** comes last (see the `opendata-research` skill, §4).
+   - **A "Sources:" line in every chart section**: directly under the
+     section's description (`.ep-note`, or whatever the page calls it), add a
+     static `<p>` reading `Sources: <a href="#src-CPM24">CPM24</a>, ...`
+     that lists the ID of every source the section draws on, including the
+     ones only some selector settings use. Keep it a separate element
+     from the description: descriptions are often filled in by script with
+     `textContent`, which would wipe a line placed inside them. Check that
+     every `#src-` link has a matching row.
+   - On a phone-width screen, stack each table row into a block (hide the
+     table header, `display: block` on `tr` and `td`).
+   Example: `data/electricity-prices/dashboard-electricity-prices/index.html`
+   (the `#sources` section and the `.ep-src-line` paragraphs).
 4. **`dashboard.json`**: see the format below, with `"artifact_url": null`
    while it is local only.
 5. **Build** `standalone.html`, **check it renders**, and **log it**: steps
@@ -104,8 +126,10 @@ no publishing approval.
 1. **Page**: read the artifact's `files/index.html` document (Artifact
    `read_db`, `collection: files`, with `out_dir` in the scratchpad), then
    write its `text` to `index.html` unchanged. If the page has no Sources
-   section (step 3 of "Building a report locally"), add one to the local `index.html` after saving,
-   bump `page_version`, and say so. The online copy only changes if the user
+   section in the form step 3 of "Building a report locally" describes (a
+   table at the bottom, with IDs, anchors and a "Sources:" line in each
+   chart section), add or convert it in the local `index.html` after
+   saving, bump `page_version`, and say so. The online copy only changes if the user
    agrees to republish.
 2. **Data**: read `datasets` the same way. For each dataset, save the file it
    points to next to `index.html`. Use the local file you uploaded if you
@@ -166,7 +190,8 @@ new data. Record it in `notes.org` the same way.
 
 - **When the data is refreshed** (new snapshot), regenerate the trimmed
   dataset file from the new snapshot, update `derived_from`, update the
-  Sources section's coverage and retrieved/updated dates, and rebuild
+  Sources table's coverage and retrieved/updated dates (and the
+  "Sources:" lines if a section gains or drops a source), and rebuild
   `standalone.html`. If the artifact is still online, ask before
   republishing it (guard above). The earlier yes doesn't cover this.
 - **When the page is edited online**, save `index.html` again, bump
