@@ -53,13 +53,14 @@ Examples: `data/rental-housing/dashboard-county-rents/`,
    section points to it. Take its facts from each dataset's `source.json`,
    not from memory. Write it all as static markup, not `data-source` marks,
    so it shows even when data fails to load.
-   - **Sources table**: one row per source, with three columns: **ID**,
-     **Dataset** and **Coverage and provenance**. The ID is the publisher's
-     own table code (`CPM24`, `WPM37`, `nrg_pc_204`). When a source has no
-     code, use a short kebab-case label (`ember-wholesale`, `CRU-PSO`). Give
-     each row the anchor `id="src-<ID>"`, and make its ID cell a link to that
-     anchor (`<a href="#src-<ID>">`), so a row can be linked to directly.
-     Style `tr:target` so the linked row is highlighted. In the other two
+   - **Sources table**: one row per source, with five columns: **ID**,
+     **Dataset**, **Coverage and provenance**, **Last updated** and
+     **Licence**. The ID is the publisher's own table code (`CPM24`, `WPM37`,
+     `nrg_pc_204`). When a source has no code, use a short kebab-case label
+     (`ember-wholesale`, `CRU-PSO`). Give each row the anchor
+     `id="src-<ID>"`, and make its ID cell a link to that anchor
+     (`<a href="#src-<ID>">`), so a row can be linked to directly.
+     Style `tr:target` so the linked row is highlighted. In the other
      columns give:
      - **Dataset**: the publisher, and the table or file name linked to its
        landing page (e.g. Central Statistics Office, *Consumer Price Index
@@ -67,12 +68,28 @@ Examples: `data/rental-housing/dashboard-county-rents/`,
      - **Coverage and provenance**: the measure and units, the time span, the
        geography and breakdowns the page uses, any derivation done here
        (e.g. "worked out as I_TAX minus X_TAX", linking the ID it was taken
-       from), and **retrieved**: the snapshot date, and the date the
-       publisher last updated it (`upstream_updated`).
+       from), and "Downloaded <date>": the date of the snapshot the page's
+       data was cut from (the one `derived_from` names, which the data script
+       normally takes as the latest).
+     - **Last updated**: the date the publisher last updated that snapshot,
+       from its `snapshots[].upstream_updated` in `source.json`, as an ISO
+       date. Don't repeat it in the coverage text. When one row covers
+       several files (e.g. a series of decision papers), give the latest
+       date first and the others under it in muted text.
+     - **Licence**: from `source.json` `licence`: the licence name linked to
+       its text (e.g. CC BY 4.0, Eurostat reuse policy), then in muted text
+       the copyright holder and what reuse requires (credit whom, state
+       changes, disclaimers). Say when a restriction doesn't apply to the
+       data shown (e.g. Eurostat's commercial-reuse limit when only EU-27
+       rows are shown). If no licence is stated, write **None stated** and
+       "personal use only" with a link to the publisher's terms.
    - **Notes and Licence** follow the table as a `<dl>`: **Notes** holds the
      caveats a reader needs (what the figures do and don't measure,
      suppressed values dropped, a missing national total, rebasing).
-     **Licence** comes last (see the `opendata-research` skill, §4).
+     **Licence** comes last and covers the page as a whole: the changes made
+     here, any disclaimer a licence requires, and whether the page can be
+     shared (see the `opendata-research` skill, §4). Each source's own
+     terms are in the Licence column.
    - **A "Sources:" line in every chart section**: directly under the
      section's description (`.ep-note`, or whatever the page calls it), add a
      static `<p>` reading `Sources: <a href="#src-CPM24">CPM24</a>, ...`
@@ -82,7 +99,9 @@ Examples: `data/rental-housing/dashboard-county-rents/`,
      `textContent`, which would wipe a line placed inside them. Check that
      every `#src-` link has a matching row.
    - On a phone-width screen, stack each table row into a block (hide the
-     table header, `display: block` on `tr` and `td`).
+     table header, `display: block` on `tr` and `td`), and label the Last
+     updated and Licence cells with a `::before` ("Last updated: ",
+     "Licence: "), since the header is hidden.
    Example: `data/electricity-prices/dashboard-electricity-prices/index.html`
    (the `#sources` section and the `.ep-src-line` paragraphs).
 4. **`dashboard.json`**: see the format below, with `"artifact_url": null`
@@ -190,8 +209,8 @@ new data. Record it in `notes.org` the same way.
 
 - **When the data is refreshed** (new snapshot), regenerate the trimmed
   dataset file from the new snapshot, update `derived_from`, update the
-  Sources table's coverage and retrieved/updated dates (and the
-  "Sources:" lines if a section gains or drops a source), and rebuild
+  Sources table's coverage, "Downloaded" date and Last updated column (and
+  the "Sources:" lines if a section gains or drops a source), and rebuild
   `standalone.html`. If the artifact is still online, ask before
   republishing it (guard above). The earlier yes doesn't cover this.
 - **When the page is edited online**, save `index.html` again, bump

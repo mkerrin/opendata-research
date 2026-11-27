@@ -371,15 +371,16 @@ data/<topic>/dashboard-<name>/
    `dash/params` exists only online. Load the `dataviz` skill before
    choosing chart forms and colours.
    **Sources**: the page ends with a Sources card: a table with one row per
-   source (ID, dataset, coverage and provenance), each row anchored as
-   `#src-<ID>`, and a "Sources: <ID>, ..." line of links under every chart
-   section's description (`save-dashboard` skill, step 3).
-   **Licence**: the Sources card ends with a `Licence` entry built from each
-   dataset's `source.json` `licence`: each source's terms with a link to the
-   page that states them, and the changes made (grouped, converted, scaled)
-   where the licence asks for them. The page is only as open as its most
-   restrictive source: if any source is not openly licensed, say "personal
-   use only" in that entry and add a footnote listing which views use which
+   source (ID, dataset, coverage and provenance, last updated, licence), each
+   row anchored as `#src-<ID>`, and a "Sources: <ID>, ..." line of links
+   under every chart section's description (`save-dashboard` skill, step 3).
+   **Licence**: each row's Licence column gives that source's terms from its
+   `source.json` `licence`, linked to the page that states them. The Sources
+   card then ends with a `Licence` entry for the page as a whole: the changes
+   made (grouped, converted, scaled) where a licence asks for them, any
+   required disclaimer, and whether the page can be shared. The page is only
+   as open as its most restrictive source: if any source is not openly
+   licensed, say "personal use only" in that entry and add a footnote listing which views use which
    source and any open alternative (with its date range). When a page
    switches source, keep a dated footnote saying what was replaced and why.
 3. **`dashboard.json`**: as in the `save-dashboard` skill, with
