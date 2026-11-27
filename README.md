@@ -18,52 +18,47 @@ All three APIs are public and need no API key. The servers only read data.
 
 - [Claude Code](https://docs.claude.com/en/docs/claude-code)
 - [uv](https://docs.astral.sh/uv/) (it installs Python 3.12 if you don't have it)
-- git
+- git (uv uses it to fetch the servers from GitHub)
 
 ## Install
 
-1. Clone this repo, then clone the three servers inside it:
+1. Clone this repo:
 
    ```sh
-   git clone git@github.com:mkerrin/opendata-research.git opendatamcp
-   cd opendatamcp
-   git clone git@github.com:mkerrin/cso-ie-mcp.git
-   git clone git@github.com:mkerrin/data-gov-ie-mcp.git
-   git clone git@github.com:mkerrin/eurostat-mcp.git
+   git clone git@github.com:mkerrin/opendata-research.git
+   cd opendata-research
    ```
 
-2. Install each server's dependencies:
-
-   ```sh
-   for d in cso-ie-mcp data-gov-ie-mcp eurostat-mcp; do (cd $d && uv sync); done
-   ```
-
-3. Create `.mcp.json` in the `opendatamcp` folder to register the servers. Replace
-   `/path/to/opendatamcp` with the full path to your clone:
+2. Create `.mcp.json` in the `opendata-research` folder to register the servers. `uvx`
+   fetches each server from GitHub and runs it, so there is nothing to clone, install or
+   `uv sync`:
 
    ```json
    {
      "mcpServers": {
        "cso-ireland": {
          "type": "stdio",
-         "command": "uv",
-         "args": ["--directory", "/path/to/opendatamcp/cso-ie-mcp", "run", "python", "main.py"]
+         "command": "uvx",
+         "args": ["--from", "git+https://github.com/mkerrin/cso-ie-mcp", "cso-ie-mcp"]
        },
        "data-gov-ie": {
          "type": "stdio",
-         "command": "uv",
-         "args": ["run", "--directory", "/path/to/opendatamcp/data-gov-ie-mcp", "data-gov-ie-mcp"]
+         "command": "uvx",
+         "args": ["--from", "git+https://github.com/mkerrin/data-gov-ie-mcp", "data-gov-ie-mcp"]
        },
        "eurostat": {
          "type": "stdio",
-         "command": "uv",
-         "args": ["run", "--directory", "/path/to/opendatamcp/eurostat-mcp", "server.py"]
+         "command": "uvx",
+         "args": ["--from", "git+https://github.com/mkerrin/eurostat-mcp", "eurostat-mcp"]
        }
      }
    }
    ```
 
-4. Start Claude Code in the folder and approve the three servers when it asks:
+   The first start is slower while uv downloads each server; after that it runs from
+   uv's cache.
+
+3. Start Claude Code in the folder and approve the three servers when it asks:
 
    ```sh
    claude
@@ -93,7 +88,7 @@ The skills can also be run by name:
 ### Coming back to your research
 
 Your research stays in `data/<topic>/` between sessions. To pick it up again, start Claude
-Code in the `opendatamcp` folder and ask it to load the topic by name:
+Code in the `opendata-research` folder and ask it to load the topic by name:
 
 - "Load energy data"
 - "Switch to the housing-supply research"
@@ -142,7 +137,10 @@ claude.ai.
 
 ## Notes
 
-- After updating a server's code, run `/mcp` and reconnect it, or restart Claude Code. A
-  running server keeps the old code.
+- To get the latest servers, fetch each one again with `--refresh`, e.g.
+  `uvx --refresh --from git+https://github.com/mkerrin/cso-ie-mcp python -c ''`, then run
+  `/mcp` and reconnect them or restart Claude Code. A running server keeps the old code.
+- To work on a server's code, clone its repo and point `.mcp.json` at the clone with
+  `"command": "uv", "args": ["run", "--directory", "/path/to/clone", "<command>"]`.
 - Eurostat datasets can be very large. Ask for specific countries and years.
 - `CLAUDE.md` has the technical details of how the workspace and servers fit together.
