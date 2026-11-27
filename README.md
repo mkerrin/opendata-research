@@ -1,16 +1,24 @@
-# opendata-research
+# opendata-research workspace
 
-Research Irish and EU open data from inside [Claude Code](https://claude.com/claude-code).
+A [Claude Code](https://claude.com/claude-code) powered workspace for
+reproducible research with open data datasets. It provides tools to
+discover, download, snapshot, analyse, and visualise the datasets. For
+now I am concentrating on Irish and European open data datasets.
 
-This workspace connects Claude to three public statistics sources through MCP servers. It also
-adds project skills that find datasets, save dated snapshots, keep research notes and build
-offline HTML dashboards.
+I publish selected dashboards at
+https://mkerrin.github.io/opendata-research/ when the results are
+noteworthy and the dataset licence permits publication.
 
-| Source | MCP server | Repo |
-|---|---|---|
-| CSO Ireland (PxStat) | `cso-ireland` | [mkerrin/cso-ie-mcp](https://github.com/mkerrin/cso-ie-mcp) |
-| data.gov.ie (CKAN) | `data-gov-ie` | [mkerrin/data-gov-ie-mcp](https://github.com/mkerrin/data-gov-ie-mcp) |
-| Eurostat (SDMX) | `eurostat` | [mkerrin/eurostat-mcp](https://github.com/mkerrin/eurostat-mcp) |
+The workspace connects Claude Code to three public data sources
+through MCP servers. Project skills support dataset discovery, dated
+snapshots, research notes, and the creation of offline HTML
+dashboards.
+
+| Source               | MCP server    | Repository                                                            |
+|----------------------|---------------|-----------------------------------------------------------------------|
+| CSO Ireland (PxStat) | `cso-ireland` | [mkerrin/cso-ie-mcp](https://github.com/mkerrin/cso-ie-mcp)           |
+| data.gov.ie (CKAN)   | `data-gov-ie` | [mkerrin/data-gov-ie-mcp](https://github.com/mkerrin/data-gov-ie-mcp) |
+| Eurostat (SDMX)      | `eurostat`    | [mkerrin/eurostat-mcp](https://github.com/mkerrin/eurostat-mcp)       |
 
 All three APIs are public and need no API key. The servers only read data.
 
