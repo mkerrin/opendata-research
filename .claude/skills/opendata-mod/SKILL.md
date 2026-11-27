@@ -1,12 +1,12 @@
 ---
-name: research-mod
+name: opendata-mod
 description: Show which open-data research topic (data/<topic>/) the session is on, and list that topic's datasets, fields and provenance in the Datasets side pane. Use when asked to load, open, switch to or show a research topic or its datasets, or to explain the "Researching:" status line or the /datasets pane.
 ---
 
 # Datasets
 
-This folder is a skill and a Claude Code mod named `research-mod`. Claude Code loads both
-automatically from the project's `.claude/skills/research-mod/`. The mod shows the current
+This folder is a skill and a Claude Code mod named `opendata-mod`. Claude Code loads both
+automatically from the project's `.claude/skills/opendata-mod/`. The mod shows the current
 research topic and its datasets. It only reads files: it never fetches, downloads or writes
 data. That is the `opendata-research` skill's job.
 

@@ -36,7 +36,7 @@ export type TopicDatasets = { topic: Topic; list: Dataset[] }
 
 declare module 'claude-code' {
   interface PluginState {
-    'research-mod': {
+    'opendata-mod': {
       topic: Topic
       datasets: Shaped<TopicDatasets>
       /** Dataset folders touched this session, per topic. */

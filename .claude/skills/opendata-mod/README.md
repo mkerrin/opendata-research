@@ -1,6 +1,6 @@
-# research-mod
+# opendata-mod
 
-This folder is both the `research-mod` skill (`SKILL.md`) and a Claude Code mod of the same name,
+This folder is both the `opendata-mod` skill (`SKILL.md`) and a Claude Code mod of the same name,
 for the `opendatamcp` workspace. The mod shows which open-data research topic (`data/<topic>/`)
 the session is working on. It lists that topic's datasets, fields and provenance in a side pane,
 read from each dataset's `source.json`.
@@ -10,7 +10,7 @@ mod displays it.
 
 ## Loading
 
-Claude Code loads the skill and the mod from `.claude/skills/research-mod/` automatically when
+Claude Code loads the skill and the mod from `.claude/skills/opendata-mod/` automatically when
 `claude` starts in the `opendatamcp` folder. No `--plugin-dir` is needed; passing one as
 well loads it twice. Saving a file in the mod reloads it.
 
@@ -58,6 +58,6 @@ If you change one side, change the other to match.
 ## Checking it
 
 ```sh
-claude plugin validate .claude/skills/research-mod
-claude plugin test .claude/skills/research-mod
+claude plugin validate .claude/skills/opendata-mod
+claude plugin test .claude/skills/opendata-mod
 ```

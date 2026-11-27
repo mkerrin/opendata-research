@@ -88,7 +88,7 @@ The skills can also be run by name:
 |---|---|
 | `/opendata-research` | Find and download datasets, record their fields, and keep notes |
 | `/save-dashboard` | Build a chart or dashboard as a self-contained HTML file that opens offline |
-| `/research-mod` | Switch research topic. `/datasets` opens a side pane listing the topic's datasets |
+| `/opendata-mod` | Switch research topic. `/datasets` opens a side pane listing the topic's datasets |
 
 ### Where results go
 
